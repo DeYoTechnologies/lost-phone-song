@@ -1,5 +1,7 @@
 # Lost Phone Song
 
+> **Android only.** This app does not work on iPhone. iPhone users can set up a similar trigger with Apple's Shortcuts app; see [IPHONE-README.md](IPHONE-README.md).
+
 An Android app that helps you find a lost phone. When **your trusted number** (or **trusted contact**) texts the phone a message containing the **trigger phrase** (**"lost phone song"** by default, or one you choose), the phone plays a song on the alarm stream at full volume, looping, for up to 5 minutes, even if it's on silent or vibrate. It works with plain SMS and, through notification access, with RCS chat messages.
 
 - Works offline. The app has no internet permission, no backend, and no account.
