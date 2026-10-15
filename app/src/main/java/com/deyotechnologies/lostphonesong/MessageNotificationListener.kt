@@ -50,7 +50,10 @@ class MessageNotificationListener : NotificationListenerService() {
                 messages.add(NotificationMatcher.Message(sender, it.text?.toString(), it.timestamp))
             }
 
-        val matching = NotificationMatcher.matchingMessages(title, messages, trustedNumber, trustedName)
+        val phrase = Prefs.triggerPhrase(this)
+        val matching = NotificationMatcher.matchingMessages(
+            title, messages, trustedNumber, trustedName, phrase,
+        )
         // A conversation's notification is re-posted for every new message, carrying the old
         // ones with it; only trigger for a message we haven't triggered on before.
         val fresh = matching.map { "${sbn.key}|${it.sender}|${it.text}|${it.timestamp}" }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Lost Phone Song</string>
-    <string name="intro">When your trusted number or contact texts \"lost phone song\" to this phone (SMS or RCS chat), it plays a song at full alarm volume for up to 5 minutes.</string>
+    <string name="intro">When your trusted number or contact texts the trigger phrase (\"lost phone song\" unless you change it) to this phone (SMS or RCS chat), it plays a song at full alarm volume for up to 5 minutes.</string>
 
     <string name="trusted_number_header">Trusted number</string>
     <string name="number_hint">e.g. +1 555-123-4567</string>
@@ -17,6 +17,14 @@
     <string name="saved_name">Saved: %1$s</string>
     <string name="name_saved">Trusted contact name saved</string>
     <string name="name_cleared">Trusted contact name cleared</string>
+
+    <string name="trigger_phrase_header">Trigger phrase</string>
+    <string name="phrase_hint">e.g. find my phone</string>
+    <string name="current_phrase">Current: \"%1$s\"</string>
+    <string name="phrase_invalid">Enter at least one word</string>
+    <string name="phrase_saved">Trigger phrase saved</string>
+    <string name="reset_phrase">Reset to default</string>
+    <string name="phrase_reset">Trigger phrase reset to \"%1$s\"</string>
 
     <string name="song_header">Song</string>
     <string name="current_song">Current: %1$s</string>

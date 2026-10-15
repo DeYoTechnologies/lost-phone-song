@@ -23,6 +23,8 @@ class MainActivity : Activity() {
     private lateinit var savedNumberText: TextView
     private lateinit var nameInput: EditText
     private lateinit var savedNameText: TextView
+    private lateinit var phraseInput: EditText
+    private lateinit var savedPhraseText: TextView
     private lateinit var notificationAccessStatus: TextView
     private lateinit var songText: TextView
     private lateinit var smsStatus: TextView
@@ -37,6 +39,8 @@ class MainActivity : Activity() {
         savedNumberText = findViewById(R.id.saved_number)
         nameInput = findViewById(R.id.name_input)
         savedNameText = findViewById(R.id.saved_name)
+        phraseInput = findViewById(R.id.phrase_input)
+        savedPhraseText = findViewById(R.id.saved_phrase)
         notificationAccessStatus = findViewById(R.id.notification_access_status)
         songText = findViewById(R.id.song_name)
         smsStatus = findViewById(R.id.sms_status)
@@ -45,9 +49,12 @@ class MainActivity : Activity() {
 
         Prefs.trustedNumber(this)?.let { numberInput.setText(it) }
         Prefs.trustedName(this)?.let { nameInput.setText(it) }
+        phraseInput.setText(Prefs.triggerPhrase(this))
 
         findViewById<Button>(R.id.save_number).setOnClickListener { saveNumber() }
         findViewById<Button>(R.id.save_name).setOnClickListener { saveName() }
+        findViewById<Button>(R.id.save_phrase).setOnClickListener { savePhrase() }
+        findViewById<Button>(R.id.reset_phrase).setOnClickListener { resetPhrase() }
         findViewById<Button>(R.id.notification_access_settings).setOnClickListener {
             openNotificationAccessSettings()
         }
@@ -85,6 +92,8 @@ class MainActivity : Activity() {
         } else {
             getString(R.string.saved_name, name)
         }
+
+        savedPhraseText.text = getString(R.string.current_phrase, Prefs.triggerPhrase(this))
 
         songText.text = getString(R.string.current_song, currentSongName())
 
@@ -125,6 +134,26 @@ class MainActivity : Activity() {
         val name = nameInput.text.toString().trim()
         Prefs.setTrustedName(this, name)
         toast(getString(if (name.isEmpty()) R.string.name_cleared else R.string.name_saved))
+        refresh()
+    }
+
+    private fun savePhrase() {
+        val phrase = phraseInput.text.toString().trim()
+        if (!PhraseMatcher.isValidPhrase(phrase)) {
+            phraseInput.error = getString(R.string.phrase_invalid)
+            return
+        }
+        Prefs.setTriggerPhrase(this, phrase)
+        phraseInput.setText(phrase)
+        toast(getString(R.string.phrase_saved))
+        refresh()
+    }
+
+    private fun resetPhrase() {
+        Prefs.setTriggerPhrase(this, null)
+        phraseInput.setText(PhraseMatcher.DEFAULT_PHRASE)
+        phraseInput.error = null
+        toast(getString(R.string.phrase_reset, PhraseMatcher.DEFAULT_PHRASE))
         refresh()
     }
 

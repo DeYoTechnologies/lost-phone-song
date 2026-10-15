@@ -84,6 +84,43 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
+        <!-- Trigger phrase -->
+        <TextView
+            style="@style/SectionHeader"
+            android:text="@string/trigger_phrase_header" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/phrase_input"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="@string/phrase_hint"
+                android:importantForAutofill="no"
+                android:inputType="text|textNoSuggestions" />
+
+            <Button
+                android:id="@+id/save_phrase"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/save" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/saved_phrase"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/reset_phrase"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/reset_phrase" />
+
         <!-- Song -->
         <TextView
             style="@style/SectionHeader"

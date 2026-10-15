@@ -8,7 +8,7 @@ import android.util.Log
 
 /**
  * Manifest-registered, so it runs even when the app's UI has never been opened since boot.
- * Plays the song when the trusted number texts the trigger phrase.
+ * Plays the song when the trusted number texts the saved trigger phrase.
  */
 class SmsReceiver : BroadcastReceiver() {
 
@@ -30,8 +30,9 @@ class SmsReceiver : BroadcastReceiver() {
             bodies.getOrPut(sender) { StringBuilder() }.append(message.messageBody.orEmpty())
         }
 
+        val phrase = Prefs.triggerPhrase(context)
         val triggered = bodies.any { (sender, body) ->
-            PhoneNumbers.matches(sender, trusted) && PhraseMatcher.matches(body.toString())
+            PhoneNumbers.matches(sender, trusted) && PhraseMatcher.matches(body.toString(), phrase)
         }
         if (triggered) AlarmService.trigger(context)
     }

@@ -1,10 +1,10 @@
 # Lost Phone Song
 
-An Android app that helps you find a lost phone. When **your trusted number** (or **trusted contact**) texts the phone a message containing **"lost phone song"**, the phone plays a song on the alarm stream at full volume, looping, for up to 5 minutes, even if it's on silent or vibrate. It works with plain SMS and, through notification access, with RCS chat messages.
+An Android app that helps you find a lost phone. When **your trusted number** (or **trusted contact**) texts the phone a message containing the **trigger phrase** (**"lost phone song"** by default, or one you choose), the phone plays a song on the alarm stream at full volume, looping, for up to 5 minutes, even if it's on silent or vibrate. It works with plain SMS and, through notification access, with RCS chat messages.
 
 - Works offline. The app has no internet permission, no backend, and no account.
 - Only one trusted number (plus, for RCS, one trusted contact name) can trigger it. Texts from anyone else are ignored.
-- The phrase is case-insensitive and must be those three words in order ("hey LOST PHONE SONG please" works; "lost my phone song" does not).
+- The phrase is case-insensitive and must be those exact words in order ("hey LOST PHONE SONG please" works; "lost my phone song" does not). You can change it to your own phrase in the app.
 - Ships with a built-in song. You can pick any audio file on the phone instead.
 - While it plays, a full-screen **"Congratulations, you found your phone!"** screen with a big **Stop** button shows, even over the lock screen. The notification also has a **Stop** button.
 
@@ -28,10 +28,22 @@ Newer releases install over older ones and keep your settings, because every bui
 1. Open **Lost Phone Song**.
 2. **Trusted number:** enter the number that will text this phone (for example, your partner's phone or your second phone), then tap **Save**. It needs at least 10 digits; `+1 555-123-4567`, `(555) 123-4567` and `5551234567` all count as the same number.
 3. **Trusted contact name (for RCS):** type the sender's name **exactly as it appears in your Messages app** (for example `Jamie Smith`), then tap **Save**. Case and leading/trailing spaces don't matter, but a partial name (`Jamie`) won't match. Leave it blank if the trusted number shows as a number in Messages. Saving a blank name clears it.
-4. **Song:** leave it on **Default (built-in)**, or tap **Choose a different song** to pick an audio file. **Reset to default song** switches back.
-5. **Permissions:** tap **Request permissions** and allow **SMS** and **Notifications**. Both status lines should read **Granted**.
-6. **Notification access (for RCS):** tap **Open notification access settings** and turn on **Lost Phone Song** (see below). The status line should read **Enabled**.
-7. **Battery:** tap **Open battery optimization settings** and allow the app to run unrestricted.
+4. **Trigger phrase:** shows the current phrase (default `lost phone song`). To use your own, type it (for example `find my phone`) and tap **Save**; it must contain at least one word. **Reset to default** switches back to `lost phone song`. See [Custom trigger phrase](#custom-trigger-phrase) for how matching works.
+5. **Song:** leave it on **Default (built-in)**, or tap **Choose a different song** to pick an audio file. **Reset to default song** switches back.
+6. **Permissions:** tap **Request permissions** and allow **SMS** and **Notifications**. Both status lines should read **Granted**.
+7. **Notification access (for RCS):** tap **Open notification access settings** and turn on **Lost Phone Song** (see below). The status line should read **Enabled**.
+8. **Battery:** tap **Open battery optimization settings** and allow the app to run unrestricted.
+
+## Custom trigger phrase
+
+The default phrase is **`lost phone song`**. You can replace it under **Trigger phrase** in the app. The same phrase is used for SMS and RCS.
+
+How a phrase matches:
+- **Exact words, in order.** Every word of your phrase must appear in the message, in the same order, with nothing between them. Extra spaces between words are fine, and the phrase can be anywhere in the message. With `find my phone`, "hey FIND MY PHONE now" works; "find my old phone" and "findmy phone" don't.
+- **Case doesn't matter.** Letters are compared case-insensitively.
+- **Whole words only.** A word can't be glued to other letters or digits: `help now` won't match "helpx now".
+- **Punctuation is literal.** Symbols in your phrase must be typed exactly: with `help!? now`, "please help!? now" works, but "help now" doesn't. Leading and trailing spaces are ignored when you save.
+- **The sender has to know it.** Only the trusted number/contact can trigger the song, and only with the exact phrase. If you change the phrase, tell whoever will text it (and write it down somewhere you can get to without your phone). A long or unusual phrase is harder to type correctly in a hurry.
 
 ## Exact Samsung settings
 
@@ -65,7 +77,7 @@ These keep One UI from blocking or sleeping the app. Menu names can vary a littl
 ## How to test
 
 1. In the app, tap **Test**. The song should play at full alarm volume and the **"Congratulations, you found your phone!"** screen should open. Tap its big **Stop** (or **Stop** in the notification).
-2. Lock the phone and leave it alone for a minute. From the **trusted number**, text it: `lost phone song`. It should start playing within a few seconds and the Stop screen should appear over the lock screen.
+2. Lock the phone and leave it alone for a minute. From the **trusted number**, text it the trigger phrase (`lost phone song` unless you changed it). It should start playing within a few seconds and the Stop screen should appear over the lock screen.
 3. If the two phones chat over RCS (Google Messages / Samsung Messages "chat"), repeat step 2 with RCS on. This needs notification access and an unmuted conversation.
 4. Optional: text the same phrase from a different number. Nothing should happen.
 

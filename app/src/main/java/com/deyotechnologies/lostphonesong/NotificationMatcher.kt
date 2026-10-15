@@ -16,7 +16,7 @@ object NotificationMatcher {
     private val NUMBER_RUN = Regex("""\+?\d[\d\s().\-]*\d""")
 
     /**
-     * True when a message contains the trigger phrase AND its sender (or [title] when the
+     * True when a message contains the trigger [phrase] AND its sender (or [title] when the
      * message has no sender) is the trusted number or the trusted contact name.
      * With neither a trusted number nor a name configured, nothing matches.
      */
@@ -25,7 +25,8 @@ object NotificationMatcher {
         messages: List<Message>,
         trustedNumber: String?,
         trustedName: String?,
-    ): Boolean = matchingMessages(title, messages, trustedNumber, trustedName).isNotEmpty()
+        phrase: String,
+    ): Boolean = matchingMessages(title, messages, trustedNumber, trustedName, phrase).isNotEmpty()
 
     /** The messages that would trigger, in order. See [matches]. */
     fun matchingMessages(
@@ -33,10 +34,11 @@ object NotificationMatcher {
         messages: List<Message>,
         trustedNumber: String?,
         trustedName: String?,
+        phrase: String,
     ): List<Message> {
         if (trustedNumber.isNullOrBlank() && trustedName.isNullOrBlank()) return emptyList()
         return messages.filter { message ->
-            PhraseMatcher.matches(message.text) &&
+            PhraseMatcher.matches(message.text, phrase) &&
                 senderMatches(message.sender ?: title, trustedNumber, trustedName)
         }
     }

@@ -9,6 +9,7 @@ object Prefs {
     private const val KEY_TRUSTED_NUMBER = "trusted_number"
     private const val KEY_SONG_URI = "song_uri"
     private const val KEY_TRUSTED_NAME = "trusted_name"
+    private const val KEY_TRIGGER_PHRASE = "trigger_phrase"
 
     private fun prefs(context: Context): SharedPreferences =
         context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
@@ -28,6 +29,25 @@ object Prefs {
         prefs(context).edit().apply {
             val trimmed = name.trim()
             if (trimmed.isEmpty()) remove(KEY_TRUSTED_NAME) else putString(KEY_TRUSTED_NAME, trimmed)
+        }.apply()
+    }
+
+    /** The saved trigger phrase, or [PhraseMatcher.DEFAULT_PHRASE] if none (or an invalid one) is saved. */
+    fun triggerPhrase(context: Context): String =
+        prefs(context).getString(KEY_TRIGGER_PHRASE, null)
+            ?.trim()
+            ?.takeIf { PhraseMatcher.isValidPhrase(it) }
+            ?: PhraseMatcher.DEFAULT_PHRASE
+
+    /** Callers validate with [PhraseMatcher.isValidPhrase] first; null resets to the default. */
+    fun setTriggerPhrase(context: Context, phrase: String?) {
+        prefs(context).edit().apply {
+            val trimmed = phrase?.trim()
+            if (trimmed.isNullOrEmpty()) {
+                remove(KEY_TRIGGER_PHRASE)
+            } else {
+                putString(KEY_TRIGGER_PHRASE, trimmed)
+            }
         }.apply()
     }
 
