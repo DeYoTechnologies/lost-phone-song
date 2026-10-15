@@ -18,6 +18,7 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.os.PowerManager
+import android.os.SystemClock
 import android.util.Log
 
 /** Foreground service that loops the song on the alarm stream at full volume. */
@@ -59,6 +60,9 @@ class AlarmService : Service() {
 
     override fun onDestroy() {
         releaseResources()
+        running = false
+        // Lets a showing StopActivity close itself, e.g. after the 5-minute auto-stop.
+        sendBroadcast(Intent(ACTION_STOPPED).setPackage(packageName))
         super.onDestroy()
     }
 
@@ -198,10 +202,10 @@ class AlarmService : Service() {
             Intent(this, AlarmService::class.java).setAction(ACTION_STOP),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
-        val openIntent = PendingIntent.getActivity(
+        val stopScreenIntent = PendingIntent.getActivity(
             this,
             0,
-            Intent(this, MainActivity::class.java),
+            StopActivity.intent(this),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
 
@@ -211,7 +215,8 @@ class AlarmService : Service() {
             .setContentText(getString(R.string.notification_text))
             .setCategory(Notification.CATEGORY_ALARM)
             .setOngoing(true)
-            .setContentIntent(openIntent)
+            .setContentIntent(stopScreenIntent)
+            .setFullScreenIntent(stopScreenIntent, true)
             .setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE)
             .addAction(
                 Notification.Action.Builder(
@@ -231,11 +236,37 @@ class AlarmService : Service() {
         private const val NOTIFICATION_ID = 1
         private const val AUTO_STOP_MS = 5 * 60 * 1000L
 
+        /** Broadcast (to this app only) when the service has stopped. */
+        const val ACTION_STOPPED = "com.deyotechnologies.lostphonesong.STOPPED"
+
+        /** True from a successful start request until the service is destroyed. */
+        @Volatile
+        var running = false
+            private set
+
+        private var lastTriggerMs: Long? = null
+
+        /**
+         * Entry point for incoming texts (SMS and notifications). The same text can arrive both
+         * ways, so a repeat within a few seconds while playing is dropped.
+         */
+        @Synchronized
+        fun trigger(context: Context): Boolean {
+            val now = SystemClock.elapsedRealtime()
+            if (TriggerDedupe.shouldIgnore(now, lastTriggerMs, running)) {
+                Log.i(TAG, "Ignoring duplicate trigger")
+                return true
+            }
+            lastTriggerMs = now
+            return start(context)
+        }
+
         /** Returns false if Android refused to start the service (e.g. background-start limits). */
         fun start(context: Context): Boolean = try {
             context.startForegroundService(
                 Intent(context, AlarmService::class.java).setAction(ACTION_START)
             )
+            running = true
             true
         } catch (e: Exception) {
             Log.w(TAG, "Could not start alarm service", e)

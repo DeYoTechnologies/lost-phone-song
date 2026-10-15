@@ -8,6 +8,7 @@ object Prefs {
     private const val FILE = "lost_phone_song"
     private const val KEY_TRUSTED_NUMBER = "trusted_number"
     private const val KEY_SONG_URI = "song_uri"
+    private const val KEY_TRUSTED_NAME = "trusted_name"
 
     private fun prefs(context: Context): SharedPreferences =
         context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
@@ -17,6 +18,17 @@ object Prefs {
 
     fun setTrustedNumber(context: Context, number: String) {
         prefs(context).edit().putString(KEY_TRUSTED_NUMBER, number).apply()
+    }
+
+    fun trustedName(context: Context): String? =
+        prefs(context).getString(KEY_TRUSTED_NAME, null)?.trim()?.takeIf { it.isNotEmpty() }
+
+    /** A blank name clears it. */
+    fun setTrustedName(context: Context, name: String) {
+        prefs(context).edit().apply {
+            val trimmed = name.trim()
+            if (trimmed.isEmpty()) remove(KEY_TRUSTED_NAME) else putString(KEY_TRUSTED_NAME, trimmed)
+        }.apply()
     }
 
     fun songUri(context: Context): Uri? =

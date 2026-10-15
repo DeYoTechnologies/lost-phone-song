@@ -33,7 +33,7 @@ class SmsReceiver : BroadcastReceiver() {
         val triggered = bodies.any { (sender, body) ->
             PhoneNumbers.matches(sender, trusted) && PhraseMatcher.matches(body.toString())
         }
-        if (triggered) AlarmService.start(context)
+        if (triggered) AlarmService.trigger(context)
     }
 
     private companion object {

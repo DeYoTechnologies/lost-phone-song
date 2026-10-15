@@ -15,11 +15,15 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.app.NotificationManagerCompat
 
 class MainActivity : Activity() {
 
     private lateinit var numberInput: EditText
     private lateinit var savedNumberText: TextView
+    private lateinit var nameInput: EditText
+    private lateinit var savedNameText: TextView
+    private lateinit var notificationAccessStatus: TextView
     private lateinit var songText: TextView
     private lateinit var smsStatus: TextView
     private lateinit var notificationStatus: TextView
@@ -31,21 +35,33 @@ class MainActivity : Activity() {
 
         numberInput = findViewById(R.id.number_input)
         savedNumberText = findViewById(R.id.saved_number)
+        nameInput = findViewById(R.id.name_input)
+        savedNameText = findViewById(R.id.saved_name)
+        notificationAccessStatus = findViewById(R.id.notification_access_status)
         songText = findViewById(R.id.song_name)
         smsStatus = findViewById(R.id.sms_status)
         notificationStatus = findViewById(R.id.notification_status)
         batteryStatus = findViewById(R.id.battery_status)
 
         Prefs.trustedNumber(this)?.let { numberInput.setText(it) }
+        Prefs.trustedName(this)?.let { nameInput.setText(it) }
 
         findViewById<Button>(R.id.save_number).setOnClickListener { saveNumber() }
+        findViewById<Button>(R.id.save_name).setOnClickListener { saveName() }
+        findViewById<Button>(R.id.notification_access_settings).setOnClickListener {
+            openNotificationAccessSettings()
+        }
         findViewById<Button>(R.id.choose_song).setOnClickListener { chooseSong() }
         findViewById<Button>(R.id.reset_song).setOnClickListener { resetSong() }
         findViewById<Button>(R.id.request_permissions).setOnClickListener { requestMissingPermissions() }
         findViewById<Button>(R.id.open_app_settings).setOnClickListener { openAppDetails() }
         findViewById<Button>(R.id.battery_settings).setOnClickListener { openBatterySettings() }
         findViewById<Button>(R.id.test_button).setOnClickListener {
-            if (!AlarmService.start(this)) toast(getString(R.string.test_failed))
+            if (AlarmService.start(this)) {
+                startActivity(StopActivity.intent(this))
+            } else {
+                toast(getString(R.string.test_failed))
+            }
         }
         findViewById<Button>(R.id.stop_button).setOnClickListener { AlarmService.stop(this) }
     }
@@ -63,6 +79,13 @@ class MainActivity : Activity() {
             getString(R.string.saved_number, number)
         }
 
+        val name = Prefs.trustedName(this)
+        savedNameText.text = if (name == null) {
+            getString(R.string.no_name_saved)
+        } else {
+            getString(R.string.saved_name, name)
+        }
+
         songText.text = getString(R.string.current_song, currentSongName())
 
         smsStatus.text = getString(
@@ -72,6 +95,12 @@ class MainActivity : Activity() {
         notificationStatus.text = getString(
             R.string.notification_permission_status,
             statusLabel(isGranted(Manifest.permission.POST_NOTIFICATIONS)),
+        )
+        val listenerEnabled = NotificationManagerCompat.getEnabledListenerPackages(this)
+            .contains(packageName)
+        notificationAccessStatus.text = getString(
+            R.string.notification_access_status,
+            getString(if (listenerEnabled) R.string.enabled else R.string.not_enabled),
         )
         val unrestricted = getSystemService(PowerManager::class.java)
             .isIgnoringBatteryOptimizations(packageName)
@@ -90,6 +119,27 @@ class MainActivity : Activity() {
         Prefs.setTrustedNumber(this, raw)
         toast(getString(R.string.number_saved))
         refresh()
+    }
+
+    private fun saveName() {
+        val name = nameInput.text.toString().trim()
+        Prefs.setTrustedName(this, name)
+        toast(getString(if (name.isEmpty()) R.string.name_cleared else R.string.name_saved))
+        refresh()
+    }
+
+    private fun openNotificationAccessSettings() {
+        for (intent in listOf(
+            Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS),
+            appDetailsIntent(),
+        )) {
+            try {
+                startActivity(intent)
+                return
+            } catch (e: ActivityNotFoundException) {
+                Log.w(TAG, "No activity for ${intent.action}", e)
+            }
+        }
     }
 
     private fun currentSongName(): String {
